@@ -1,0 +1,21 @@
+services:
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      # Vacio = LLM simulado. Para un LLM real define estas variables (p. ej. en un fichero .env)
+      - LLM_MODEL=${LLM_MODEL:-}
+      - AZURE_API_KEY=${AZURE_API_KEY:-}
+      - AZURE_API_BASE=${AZURE_API_BASE:-}
+      - AZURE_API_VERSION=${AZURE_API_VERSION:-}
+
+  streamlit:
+    build: .
+    command: ["uv", "run", "--no-sync", "streamlit", "run", "frontend/app.py", "--server.address", "0.0.0.0", "--server.port", "8501"]
+    ports:
+      - "8501:8501"
+    environment:
+      - API_URL=http://api:8000
+    depends_on:
+      - api
